@@ -167,7 +167,10 @@ def score_track(details,result_details,top_score = 200):
 def parse_args():
     parser = argparse.ArgumentParser(description="Import playlist into Google "
                                      "Play Music")
-    parser.add_argument("playlist-filename", action="store",
+    parser.add_argument("--username", action="store", help="Google username",
+                        required=True)
+    parser.add_argument("playlist_filename", action="store",
+                        metavar="playlist-filename",
                         help="Playlist CSV file to import")
     args = parser.parse_args()
     return args
@@ -197,7 +200,7 @@ with codecs.open(input_filename, encoding='utf-8', mode='r', errors='ignore') as
 log('done. '+str(len(tracks))+' lines loaded.')
 
 # log in and load personal library
-api = open_api()
+api = open_api(args.username)
 library = load_personal_library()
 
 # begin searching for the tracks

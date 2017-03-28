@@ -171,7 +171,7 @@ def create_details_string(details_dict, skip_id = False):
     return out_string
 
 # logs into google music api
-def open_api():
+def open_api(username):
     global api
     log('Logging into google music...')
     # get the password each time so that it isn't stored in plain text

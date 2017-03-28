@@ -8,7 +8,10 @@ from common import *
 def parse_args():
     parser = argparse.ArgumentParser(description="Export playlists from "
                                      "Google Play Music")
-    parser.add_argument("output-directory", action="store",
+    parser.add_argument("--username", action="store", help="Google username",
+                        required=True)
+    parser.add_argument("output_directory", action="store",
+                        metavar="output-directory",
                         help="Directory into which to export playlists")
     args = parser.parse_args()
     return args
@@ -21,7 +24,7 @@ if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
 # log in and load personal library
-api = open_api()
+api = open_api(args.username)
 library = load_personal_library()
 
 def playlist_handler(playlist_name, playlist_description, playlist_tracks):

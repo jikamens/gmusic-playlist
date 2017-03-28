@@ -8,8 +8,6 @@ playlist scripts for gmusic
 - python 2.7 - https://www.python.org
 - gmusicapi - https://github.com/simon-weber/Unofficial-Google-Music-API
 
-Before using the scripts, open up the preferences.py file and change the username.
-
 When the scripts are run they will prompt for your password.  If you use two factor authentication you will need to create and use an application password.
 
 ## ExportLists.py
