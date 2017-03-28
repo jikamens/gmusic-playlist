@@ -36,7 +36,8 @@ allaccess = True
 if '-dDEBUG' in sys.argv:
     debug = True
 
-def parse_args(description, program_name, path_target, path_help):
+def parse_args(description, program_name, path_target, path_help,
+               extra_args=()):
     default_cf = os.path.expanduser("~/.gmusic-playlist.ini")
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("--config-file", "-cf", action="store",
@@ -52,6 +53,9 @@ def parse_args(description, program_name, path_target, path_help):
     parser.add_argument(path_target, action="store",
                         metavar=path_target.replace('_', '-'),
                         help=path_help)
+    for arg in extra_args:
+        parser.add_argument(*arg[0], **arg[1])
+
     args = parser.parse_args()
 
     if not args.username:

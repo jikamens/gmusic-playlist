@@ -165,7 +165,12 @@ def score_track(details,result_details,top_score = 200):
 
 args = parse_args('Import playlist into Google Play Music',
                   'ImportList', 'playlist_filename',
-                  'Playlist CSV file to import')
+                  'Playlist CSV file to import',
+                  extra_args=(
+                      (('--replace',),
+                       {'action': 'store_true',
+                        'help': 'Replace playlist(s) with the same name'}),
+                  ))
 
 # setup the input and output filenames and derive the playlist name
 input_filename = args.playlist_filename.decode('utf-8')
@@ -294,6 +299,21 @@ total_time = time.time() - start_time
 log('===============================================================')
 log(u'Adding '+unicode(len(song_ids))+' found songs to: '+playlist_name)
 log('===============================================================')
+
+# delete old playlists if requested
+if args.replace:
+    for playlist in api.get_all_playlists():
+        if playlist['kind'] != 'sj#playlist':
+            continue
+        if playlist['type'] != 'USER_GENERATED':
+            continue
+        if (playlist['name'] != playlist_name and
+            not playlist['name'].startswith(u'{} Part '.format(
+                playlist_name))):
+            continue
+        api.delete_playlist(playlist['id'])
+        log(u'Deleted playlist {} named {}'.format(
+            playlist['id'], playlist['name']))
 
 # add the songs to the playlist(s)
 max_playlist_size = 1000
