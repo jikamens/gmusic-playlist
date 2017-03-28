@@ -60,6 +60,7 @@ def parse_args(description, program_name, path_target, path_help,
 
     if not args.username:
         args.username = get_config_username(program_name, args.config_file)
+    args.password = get_config_password(program_name, args.config_file)
     if not args.android_id or args.create_android_id:
         args.android_id = get_config_android_id(program_name, args.config_file,
                                                 args.create_android_id)
@@ -88,6 +89,9 @@ def get_config_username(program_name, config_file):
         sys.exit('Specify username on command line or put it in "{}" or '
                  '"defaults" section of {}'.format(program_name, config_file))
     return username
+
+def get_config_password(program_name, config_file):
+    return get_config_setting(program_name, config_file, 'password')
 
 def get_config_android_id(program_name, config_file, do_create):
     if do_create:
@@ -252,11 +256,11 @@ def create_details_string(details_dict, skip_id = False):
     return out_string
 
 # logs into google music api
-def open_api(username, android_id=None):
+def open_api(username, android_id=None, password=None):
     global api
     log('Logging into google music...')
-    # get the password each time so that it isn't stored in plain text
-    password = getpass.getpass(username + '\'s password: ')
+    if not password:
+        password = getpass.getpass(username + '\'s password: ')
     
     api = Mobileclient()
     if not api.login(username, password,
