@@ -14,7 +14,7 @@ if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
 # log in and load personal library
-api = open_api(args.username)
+api = open_api(args.username, args.android_id)
 library = load_personal_library()
 
 def playlist_handler(playlist_name, playlist_description, playlist_tracks):

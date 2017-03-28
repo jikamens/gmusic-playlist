@@ -12,6 +12,7 @@ from gmusicapi import __version__ as gmusicapi_version
 from gmusicapi import Mobileclient
 from gmusicapi.exceptions import CallFailure
 from preferences import *
+import random
 import re
 import time
 import getpass
@@ -42,6 +43,12 @@ def parse_args(description, program_name, path_target, path_help):
                         help="INI file to read settings from (default {})".
                         format(default_cf), default=default_cf)
     parser.add_argument("--username", action="store", help="Google username")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--android-id", action="store", help="Android ID to "
+                       "connect with instead of using MAC address")
+    group.add_argument("--create-android-id", action="store_true",
+                       help="Generate a random android ID and store it in the "
+                       "configuration file for future use")
     parser.add_argument(path_target, action="store",
                         metavar=path_target.replace('_', '-'),
                         help=path_help)
@@ -49,6 +56,9 @@ def parse_args(description, program_name, path_target, path_help):
 
     if not args.username:
         args.username = get_config_username(program_name, args.config_file)
+    if not args.android_id or args.create_android_id:
+        args.android_id = get_config_android_id(program_name, args.config_file,
+                                                args.create_android_id)
     return args
 
 def read_config_file(filename):
@@ -74,6 +84,23 @@ def get_config_username(program_name, config_file):
         sys.exit('Specify username on command line or put it in "{}" or '
                  '"defaults" section of {}'.format(program_name, config_file))
     return username
+
+def get_config_android_id(program_name, config_file, do_create):
+    if do_create:
+        parser = read_config_file(config_file)
+        android_id = ''.join(hex(int(random.random() * 16))[-1] for
+                             i in range(16))
+        if not parser.has_section('defaults'):
+            parser.add_section('defaults')
+        parser.set('defaults', 'android_id', android_id)
+        parser.write(open(config_file, 'w'))
+        return android_id
+    android_id = get_config_setting(program_name, config_file, 'android_id')
+    if not android_id:
+        sys.exit('Specify android ID or --create-android-id on command line '
+                 'or put it in "{}" or "defaults" section of {}'.format(
+                     program_name, config_file))
+    return android_id
 
 # check versions
 def assert_prerequisites():
@@ -213,14 +240,15 @@ def create_details_string(details_dict, skip_id = False):
     return out_string
 
 # logs into google music api
-def open_api(username):
+def open_api(username, android_id=None):
     global api
     log('Logging into google music...')
     # get the password each time so that it isn't stored in plain text
     password = getpass.getpass(username + '\'s password: ')
     
     api = Mobileclient()
-    if not api.login(username, password, Mobileclient.FROM_MAC_ADDRESS):
+    if not api.login(username, password,
+                     android_id or Mobileclient.FROM_MAC_ADDRESS):
         log('ERROR unable to login')
         time.sleep(3)
         exit()

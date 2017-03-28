@@ -190,7 +190,7 @@ with codecs.open(input_filename, encoding='utf-8', mode='r', errors='ignore') as
 log('done. '+str(len(tracks))+' lines loaded.')
 
 # log in and load personal library
-api = open_api(args.username)
+api = open_api(args.username, args.android_id)
 library = load_personal_library()
 
 # begin searching for the tracks
