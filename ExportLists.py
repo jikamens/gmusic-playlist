@@ -1,15 +1,22 @@
 # Author: John Elkins <john.elkins@yahoo.com>
 # License: MIT <LICENSE>
 
+import argparse
+import os
 from common import *
 
-if len(sys.argv) < 2:
-    log('ERROR output directory is required')
-    time.sleep(3)
-    exit()
+def parse_args():
+    parser = argparse.ArgumentParser(description="Export playlists from "
+                                     "Google Play Music")
+    parser.add_argument("output-directory", action="store",
+                        help="Directory into which to export playlists")
+    args = parser.parse_args()
+    return args
+
+args = parse_args()
 
 # setup the output directory, create it if needed
-output_dir = sys.argv[1]
+output_dir = args.output_directory
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 

@@ -1,6 +1,8 @@
 # Author: John Elkins <john.elkins@yahoo.com>
 # License: MIT <LICENSE>
 
+import argparse
+import os
 import re
 import datetime
 import math
@@ -162,13 +164,18 @@ def score_track(details,result_details,top_score = 200):
 
     return (result_score,score_reason)
 
-# check to make sure a filename was given
-if len(sys.argv) < 2:
-    delayed_exit(u'ERROR input filename is required')
+def parse_args():
+    parser = argparse.ArgumentParser(description="Import playlist into Google "
+                                     "Play Music")
+    parser.add_argument("playlist-filename", action="store",
+                        help="Playlist CSV file to import")
+    args = parser.parse_args()
+    return args
 
+args = parse_args()
 
 # setup the input and output filenames and derive the playlist name
-input_filename = sys.argv[1].decode('utf-8')
+input_filename = args.playlist_filename.decode('utf-8')
 output_filename = os.path.splitext(input_filename)[0]
 output_filename = re.compile('_\d{14}$').sub(u'',output_filename)
 playlist_name = os.path.basename(output_filename)
