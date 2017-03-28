@@ -5,6 +5,8 @@ __version__ = '0.160530'
 
 __required_gmusicapi_version__ = '10.0.0'
 
+import argparse
+from ConfigParser import SafeConfigParser
 from collections import Counter
 from gmusicapi import __version__ as gmusicapi_version
 from gmusicapi import Mobileclient
@@ -32,6 +34,46 @@ allaccess = True
 # check for debug set via cmd line
 if '-dDEBUG' in sys.argv:
     debug = True
+
+def parse_args(description, program_name, path_target, path_help):
+    default_cf = os.path.expanduser("~/.gmusic-playlist.ini")
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument("--config-file", "-cf", action="store",
+                        help="INI file to read settings from (default {})".
+                        format(default_cf), default=default_cf)
+    parser.add_argument("--username", action="store", help="Google username")
+    parser.add_argument(path_target, action="store",
+                        metavar=path_target.replace('_', '-'),
+                        help=path_help)
+    args = parser.parse_args()
+
+    if not args.username:
+        args.username = get_config_username(program_name, args.config_file)
+    return args
+
+def read_config_file(filename):
+    parser = SafeConfigParser()
+    parser.read(filename)
+    return parser
+
+def get_config_setting(program_name, config_file, setting):
+    parser = read_config_file(config_file)
+    try:
+        value = parser.get(program_name, setting)
+        return value
+    except:
+        try:
+            value = parser.get('defaults', setting)
+            return value
+        except:
+            return None
+
+def get_config_username(program_name, config_file):
+    username = get_config_setting(program_name, config_file, 'username')
+    if not username:
+        sys.exit('Specify username on command line or put it in "{}" or '
+                 '"defaults" section of {}'.format(program_name, config_file))
+    return username
 
 # check versions
 def assert_prerequisites():

@@ -1,22 +1,12 @@
 # Author: John Elkins <john.elkins@yahoo.com>
 # License: MIT <LICENSE>
 
-import argparse
 import os
 from common import *
 
-def parse_args():
-    parser = argparse.ArgumentParser(description="Export playlists from "
-                                     "Google Play Music")
-    parser.add_argument("--username", action="store", help="Google username",
-                        required=True)
-    parser.add_argument("output_directory", action="store",
-                        metavar="output-directory",
-                        help="Directory into which to export playlists")
-    args = parser.parse_args()
-    return args
-
-args = parse_args()
+args = parse_args('Export playlists from Google Play Music',
+                  'ExportLists', 'output_directory',
+                  'Directory into which to export playlists')
 
 # setup the output directory, create it if needed
 output_dir = args.output_directory

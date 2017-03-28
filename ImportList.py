@@ -1,7 +1,6 @@
 # Author: John Elkins <john.elkins@yahoo.com>
 # License: MIT <LICENSE>
 
-import argparse
 import os
 import re
 import datetime
@@ -164,18 +163,9 @@ def score_track(details,result_details,top_score = 200):
 
     return (result_score,score_reason)
 
-def parse_args():
-    parser = argparse.ArgumentParser(description="Import playlist into Google "
-                                     "Play Music")
-    parser.add_argument("--username", action="store", help="Google username",
-                        required=True)
-    parser.add_argument("playlist_filename", action="store",
-                        metavar="playlist-filename",
-                        help="Playlist CSV file to import")
-    args = parser.parse_args()
-    return args
-
-args = parse_args()
+args = parse_args('Import playlist into Google Play Music',
+                  'ImportList', 'playlist_filename',
+                  'Playlist CSV file to import')
 
 # setup the input and output filenames and derive the playlist name
 input_filename = args.playlist_filename.decode('utf-8')
