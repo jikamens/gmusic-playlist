@@ -180,8 +180,16 @@ def create_result_details(track):
     result_details = {}
     for key, value in track.iteritems():
         result_details[key] = value
-    result_details['songid'] = (track.get('storeId')
-        if track.get('storeId') else track.get('id'))
+# Previously, the code did this:
+#
+#    result_details['songid'] = (track.get('storeId')
+#        if track.get('storeId') else track.get('id'))
+#
+# But when the code was doing that, songs which had a storeId were not
+# being added to my playlists. I do not understand why storeId was
+# being used instead of id; all I know is that removing that logic
+# fixes my playlists.
+    result_details['songid'] = track.get('id')
     return result_details
 
 # creates details dictionary based off the given details list
