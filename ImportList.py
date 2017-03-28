@@ -57,6 +57,34 @@ def log_unmatched(track):
     csvfile.write(os.linesep)
     no_matches += 1
 
+def best_match(details, results):
+    # Two heuristics for choosing the best match:
+    #
+    # 1. If some of the results are already in song_ids, then choose
+    #    one that isn't.
+    # 2. Prefer an exact match on title, album, artist (in that order)
+    #    over a substring match.
+    if len(results) == 1:
+        return results[0]
+
+    # create_result_details determines the songid
+    pairs = ((r, create_result_details(r['track'])) for r in results)
+
+    new_pairs = [p for p in pairs if p[1]['songid'] not in song_ids]
+    if len(new_pairs) == 1:
+        # If exactly one track isn't already selected, use it.
+        return new_pairs[0][0]
+    elif len(new_pairs) > 0:
+        # Only use the prefer-new heuristic if at least one track passes it.
+        pairs = new_pairs
+
+    for field in ('title', 'album', 'artist'):
+        for pair in pairs:
+            if details[field] and details[field] == pair[1][field]:
+                return pair[0]
+
+    return pairs[0][0]
+
 # search for the song with the given details
 def search_for_track(details):
     search_results = []
@@ -94,7 +122,7 @@ def search_for_track(details):
     if not len(search_results):
         return None
 
-    top_result = search_results[0]
+    top_result = best_match(details, search_results)
     # if we have detailed info, perform a detailed search
     if details['artist'] and details['title']:
         search_results = [item for item in search_results if
@@ -105,7 +133,7 @@ def search_for_track(details):
                     s_in_s(details['album'],item['track']['album'])]
         dlog('detail search results: '+str(len(search_results)))
         if len(search_results) != 0:
-            top_result = search_results[0]
+            top_result = best_match(details, search_results)
 
     return top_result
 
