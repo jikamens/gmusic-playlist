@@ -83,7 +83,7 @@ def best_match(details, results):
             if details[field] and details[field] == pair[1][field]:
                 return pair[0]
 
-    return pairs[0][0]
+    return pairs[0][0] if pairs else None
 
 # search for the song with the given details
 def search_for_track(details):
